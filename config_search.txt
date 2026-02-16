@@ -1,0 +1,93 @@
+# Search Parameters Configuration
+# Edit these values to customize your literature search
+
+# === DATE RANGE ===
+# Minimum publication year (recommend: year transformers emerged for your field)
+min_year = 2018
+
+# Maximum publication year (leave as 'current' for current year, or specify year)
+max_year = current
+
+# === QUALITY FILTERS ===
+# Minimum relevance score (0-100, recommend: 30-50)
+min_relevance = 40.0
+
+# Maximum results per query (5-20, higher = more comprehensive but slower)
+max_results_per_query = 10
+
+# === REQUIRED KEYWORDS ===
+# Papers must contain at least ONE of these terms
+# One keyword per line, blank lines ignored
+[required_keywords]
+transformer
+language model
+foundation model
+pre-trained
+BERT
+attention mechanism
+embedding
+self-supervised
+deep learning
+neural network
+machine learning
+
+# === EXCLUSION KEYWORDS ===
+# Papers containing ANY of these terms will be rejected
+# One keyword per line, blank lines ignored
+[exclusion_keywords]
+sleep
+sleeping
+circadian
+insomnia
+clinical trial
+patient
+disease diagnosis
+cancer therapy
+drug discovery
+pharmaceutical
+medical imaging
+radiology
+Alzheimer
+Parkinson
+hospital
+medication
+surgery
+
+# === BOOST KEYWORDS ===
+# Papers containing these get higher relevance scores
+# Customize based on your research domain
+[boost_keywords]
+genome
+genomic
+DNA
+gene
+chromosome
+nucleotide
+sequence
+agriculture
+breeding
+plant
+crop
+
+# === ADAPTIVE SETTINGS ===
+# Enable automatic parameter adjustment based on results
+adaptive_mode = true
+
+# Automatically generate queries to fill coverage gaps
+auto_refine_queries = true
+
+# How aggressively to adapt (0.1 = cautious, 0.5 = aggressive)
+learning_rate = 0.1
+
+# Target number of publications per run
+target_publications_per_run = 30
+
+# === SEARCH QUERIES ===
+# Custom search queries (one per line)
+# Use {model} and {topic} as placeholders
+# Leave section empty to use auto-generated queries
+[custom_queries]
+genomic foundation model plant
+{model} transformer
+{topic} genome language model
+crop genomics deep learning

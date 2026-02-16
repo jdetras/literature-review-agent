@@ -1,0 +1,26 @@
+# Example Configuration: Cancer Research
+# Copy this to config_models.txt to search cancer research models
+
+# Cancer-Specific Models
+AlphaFold
+ESM-2
+ProtGPT
+ProGen
+TAPE
+ProteinBERT
+OncoKB
+CancerBERT
+
+# General Medical AI Models
+BioBERT
+PubMedBERT
+ClinicalBERT
+MedBERT
+SciBERT
+
+# Deep Learning Models
+ResNet
+VGG
+BERT
+GPT
+Transformer

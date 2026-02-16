@@ -1,0 +1,34 @@
+# Example Configuration: Cancer Research Topics
+# Copy this to config_topics.txt
+
+# Cancer Types
+breast cancer
+lung cancer
+prostate cancer
+colorectal cancer
+melanoma
+leukemia
+lymphoma
+pancreatic cancer
+
+# Treatments
+immunotherapy
+chemotherapy
+radiation therapy
+targeted therapy
+CAR-T cell therapy
+
+# Biomarkers
+PD-L1
+EGFR
+KRAS
+BRCA1
+BRCA2
+HER2
+
+# Research Areas
+tumor microenvironment
+metastasis
+drug resistance
+precision oncology
+liquid biopsy

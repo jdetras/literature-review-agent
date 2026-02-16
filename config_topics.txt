@@ -1,0 +1,45 @@
+# Target Topics/Subjects Configuration
+# One topic per line (can be crops, diseases, organisms, etc.)
+# Lines starting with # are comments
+
+# === CEREAL CROPS ===
+rice
+Oryza sativa
+wheat
+Triticum
+Triticum aestivum
+maize
+corn
+Zea mays
+barley
+Hordeum
+Hordeum vulgare
+sorghum
+Sorghum bicolor
+millet
+pearl millet
+finger millet
+oats
+Avena
+Avena sativa
+rye
+Secale
+
+# === OTHER CROPS (examples) ===
+# soybean
+# Glycine max
+# cotton
+# Gossypium
+# tomato
+# Solanum lycopersicum
+
+# === DISEASES (examples) ===
+# blast disease
+# rust
+# blight
+
+# === CUSTOM TOPICS ===
+# Add your research topics here:
+# climate resilience
+# drought tolerance
+# yield prediction

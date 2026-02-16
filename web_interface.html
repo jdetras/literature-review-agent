@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literature Review Agent - Web Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .main-container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        .config-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+        }
+        .config-section h4 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        textarea.form-control {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .btn-run {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .btn-run:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .btn-run:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status-panel {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            min-height: 300px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        .status-message {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+        .status-info { background: #d1ecf1; color: #0c5460; }
+        .status-success { background: #d4edda; color: #155724; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .results-container {
+            margin-top: 40px;
+            display: none;
+        }
+        .publication-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s;
+        }
+        .publication-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+        .relevance-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .relevance-high { background: #28a745; color: white; }
+        .relevance-medium { background: #ffc107; color: #333; }
+        .relevance-low { background: #dc3545; color: white; }
+        .stats-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .stats-number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        .template-selector {
+            margin-bottom: 30px;
+        }
+        .template-card {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        .template-card:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+        .template-card.active {
+            border-color: #667eea;
+            background: #e7f1ff;
+        }
+        .progress-bar-container {
+            display: none;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="bi bi-book"></i> Literature Review Agent</h1>
+            <p class="lead">Configure and run automated literature searches directly in your browser</p>
+        </div>
+
+        <!-- Template Selector -->
+        <div class="template-selector">
+            <h4><i class="bi bi-grid"></i> Quick Start Templates</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="template-card" onclick="loadTemplate('plant-genomics')">
+                        <h5>🌾 Plant Genomics</h5>
+                        <small>Search genomic LLMs for rice, wheat, and cereals</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="template-card" onclick="loadTemplate('cancer-research')">
+                        <h5>🧬 Cancer Research</h5>
+                        <small>Search AI models for cancer and immunotherapy</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="template-card" onclick="loadTemplate('custom')">
+                        <h5>⚙️ Custom</h5>
+                        <small>Configure your own search parameters</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Sections -->
+        <div class="config-section">
+            <h4><i class="bi bi-cpu"></i> Target Models/Methods</h4>
+            <p class="text-muted">Enter models or methods to track (one per line)</p>
+            <textarea id="models-input" class="form-control" rows="6" placeholder="AgroNT
+DNABERT
+PlantCAD
+Nucleotide Transformer
+HyenaDNA"></textarea>
+        </div>
+
+        <div class="config-section">
+            <h4><i class="bi bi-journal-text"></i> Research Topics</h4>
+            <p class="text-muted">Enter your research topics, organisms, or areas of interest (one per line)</p>
+            <textarea id="topics-input" class="form-control" rows="6" placeholder="rice
+wheat
+maize
+Oryza sativa
+drought tolerance"></textarea>
+        </div>
+
+        <div class="config-section">
+            <h4><i class="bi bi-sliders"></i> Search Parameters</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <label class="form-label">Minimum Year</label>
+                    <input type="number" id="min-year" class="form-control" value="2018" min="2000" max="2025">
+                    <small class="text-muted">Only search papers from this year onwards</small>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Minimum Relevance Score (0-100)</label>
+                    <input type="number" id="min-relevance" class="form-control" value="40" min="0" max="100">
+                    <small class="text-muted">Higher = stricter quality filter</small>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <label class="form-label">Exclusion Keywords (optional)</label>
+                    <textarea id="exclusion-keywords" class="form-control" rows="3" placeholder="sleep, clinical trial, patient"></textarea>
+                    <small class="text-muted">Papers containing these words will be filtered out (comma-separated)</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Run Button -->
+        <div class="text-center my-4">
+            <button class="btn btn-run" onclick="runSearch()">
+                <i class="bi bi-search"></i> Run Literature Search
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar-container" id="progress-container">
+            <div class="progress">
+                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                     role="progressbar" style="width: 0%"></div>
+            </div>
+            <div class="text-center mt-2">
+                <small id="progress-text">Initializing...</small>
+            </div>
+        </div>
+
+        <!-- Status Panel -->
+        <div class="status-panel" id="status-panel">
+            <div class="status-message status-info">
+                <i class="bi bi-info-circle"></i> Ready to search. Configure parameters above and click "Run Literature Search"
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div class="results-container" id="results-container">
+            <h3 class="mt-5 mb-4"><i class="bi bi-clipboard-data"></i> Search Results</h3>
+            
+            <!-- Statistics -->
+            <div class="row" id="stats-row">
+                <!-- Stats will be inserted here -->
+            </div>
+
+            <!-- Publications List -->
+            <div id="publications-list">
+                <!-- Publications will be inserted here -->
+            </div>
+
+            <!-- Download Options -->
+            <div class="text-center mt-4">
+                <button class="btn btn-primary me-2" onclick="downloadJSON()">
+                    <i class="bi bi-download"></i> Download JSON
+                </button>
+                <button class="btn btn-success" onclick="downloadMarkdown()">
+                    <i class="bi bi-file-text"></i> Download Markdown
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let searchResults = null;
+
+        // Template configurations
+        const templates = {
+            'plant-genomics': {
+                models: `AgroNT
+DNABERT
+DNABERT-2
+PlantCAD
+Nucleotide Transformer
+HyenaDNA
+GenSLM
+Enformer`,
+                topics: `rice
+Oryza sativa
+wheat
+Triticum
+maize
+Zea mays
+barley
+sorghum`,
+                minYear: 2018,
+                minRelevance: 40,
+                exclusion: 'sleep, clinical trial, patient, disease diagnosis, pharmaceutical'
+            },
+            'cancer-research': {
+                models: `AlphaFold
+BioBERT
+CancerBERT
+PubMedBERT
+ClinicalBERT
+ProteinBERT
+ESM-2`,
+                topics: `breast cancer
+lung cancer
+immunotherapy
+PD-L1
+checkpoint inhibitor
+tumor microenvironment
+biomarker`,
+                minYear: 2015,
+                minRelevance: 45,
+                exclusion: 'agriculture, plant, crop, veterinary'
+            },
+            'custom': {
+                models: '',
+                topics: '',
+                minYear: 2018,
+                minRelevance: 40,
+                exclusion: ''
+            }
+        };
+
+        // Load template
+        function loadTemplate(templateName) {
+            const template = templates[templateName];
+            document.getElementById('models-input').value = template.models;
+            document.getElementById('topics-input').value = template.topics;
+            document.getElementById('min-year').value = template.minYear;
+            document.getElementById('min-relevance').value = template.minRelevance;
+            document.getElementById('exclusion-keywords').value = template.exclusion;
+
+            // Update active template card
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.target.closest('.template-card').classList.add('active');
+
+            addStatusMessage('Template loaded: ' + templateName, 'info');
+        }
+
+        // Add status message
+        function addStatusMessage(message, type = 'info') {
+            const statusPanel = document.getElementById('status-panel');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `status-message status-${type}`;
+            
+            const icon = {
+                'info': 'bi-info-circle',
+                'success': 'bi-check-circle',
+                'warning': 'bi-exclamation-triangle',
+                'error': 'bi-x-circle'
+            }[type] || 'bi-info-circle';
+            
+            messageDiv.innerHTML = `<i class="bi ${icon}"></i> ${message}`;
+            statusPanel.appendChild(messageDiv);
+            statusPanel.scrollTop = statusPanel.scrollHeight;
+        }
+
+        // Update progress
+        function updateProgress(percent, text) {
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            progressContainer.style.display = 'block';
+            progressBar.style.width = percent + '%';
+            progressText.textContent = text;
+        }
+
+        // Run search (simulated - will use Claude API in production)
+        async function runSearch() {
+            // Get configuration
+            const config = {
+                models: document.getElementById('models-input').value.split('\n').filter(m => m.trim()),
+                topics: document.getElementById('topics-input').value.split('\n').filter(t => t.trim()),
+                minYear: parseInt(document.getElementById('min-year').value),
+                minRelevance: parseFloat(document.getElementById('min-relevance').value),
+                exclusion: document.getElementById('exclusion-keywords').value.split(',').map(k => k.trim()).filter(k => k)
+            };
+
+            // Validation
+            if (config.models.length === 0) {
+                addStatusMessage('Error: Please add at least one model', 'error');
+                return;
+            }
+            if (config.topics.length === 0) {
+                addStatusMessage('Error: Please add at least one research topic', 'error');
+                return;
+            }
+
+            // Clear previous results
+            document.getElementById('status-panel').innerHTML = '';
+            document.getElementById('results-container').style.display = 'none';
+            
+            // Disable button
+            const runBtn = document.querySelector('.btn-run');
+            runBtn.disabled = true;
+            runBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
+
+            addStatusMessage('Starting literature search...', 'info');
+            updateProgress(10, 'Initializing search...');
+
+            try {
+                // Simulate search process (in production, this calls Claude API)
+                addStatusMessage(`Configuration: ${config.models.length} models, ${config.topics.length} topics`, 'info');
+                updateProgress(20, 'Generating search queries...');
+                await sleep(1000);
+
+                addStatusMessage('Searching bioRxiv...', 'info');
+                updateProgress(40, 'Searching bioRxiv...');
+                await sleep(1500);
+
+                addStatusMessage('Searching PubMed Central...', 'info');
+                updateProgress(60, 'Searching PubMed Central...');
+                await sleep(1500);
+
+                addStatusMessage('Searching arXiv...', 'info');
+                updateProgress(80, 'Searching arXiv...');
+                await sleep(1500);
+
+                // Generate mock results
+                const results = await generateMockResults(config);
+                
+                updateProgress(90, 'Processing results...');
+                await sleep(500);
+
+                addStatusMessage(`Found ${results.publications.length} relevant publications`, 'success');
+                updateProgress(100, 'Complete!');
+
+                // Display results
+                displayResults(results);
+                searchResults = results;
+
+                addStatusMessage('Search complete! Results displayed below.', 'success');
+
+            } catch (error) {
+                addStatusMessage('Error: ' + error.message, 'error');
+            } finally {
+                runBtn.disabled = false;
+                runBtn.innerHTML = '<i class="bi bi-search"></i> Run Literature Search';
+                setTimeout(() => {
+                    document.getElementById('progress-container').style.display = 'none';
+                }, 2000);
+            }
+        }
+
+        // Generate mock results (placeholder for actual API call)
+        async function generateMockResults(config) {
+            // In production, this would call the Anthropic API to run the actual search
+            // For demo purposes, we generate realistic mock data
+            
+            const mockPublications = [
+                {
+                    title: "AgroNT: A Foundation Model for Agricultural Genome Analysis",
+                    authors: ["Smith J", "Chen L", "Kumar R"],
+                    year: 2024,
+                    abstract: "We present AgroNT, a transformer-based foundation model specifically designed for agricultural genome analysis...",
+                    url: "https://example.com/paper1",
+                    source: "bioRxiv",
+                    relevance_score: 85.5
+                },
+                {
+                    title: "Deep Learning Approaches for Rice Genome Annotation Using DNABERT",
+                    authors: ["Wang X", "Lee S", "Park M"],
+                    year: 2023,
+                    abstract: "This study applies DNABERT architecture to rice genome annotation tasks, achieving state-of-the-art results...",
+                    url: "https://example.com/paper2",
+                    source: "PMC",
+                    relevance_score: 78.3
+                },
+                {
+                    title: "Nucleotide Transformers for Plant Genomics: A Comparative Study",
+                    authors: ["Garcia A", "Thompson B"],
+                    year: 2023,
+                    abstract: "We compare various nucleotide transformer architectures on plant genomic datasets including wheat and maize...",
+                    url: "https://example.com/paper3",
+                    source: "arXiv",
+                    relevance_score: 72.1
+                },
+                {
+                    title: "PlantCAD: Computer-Aided Design of Plant Genomes with Foundation Models",
+                    authors: ["Patel R", "Johnson K", "Liu Y"],
+                    year: 2024,
+                    abstract: "PlantCAD introduces a novel approach to genome design using foundation models trained on diverse plant species...",
+                    url: "https://example.com/paper4",
+                    source: "bioRxiv",
+                    relevance_score: 68.9
+                },
+                {
+                    title: "HyenaDNA Applications in Cereal Crop Genomics",
+                    authors: ["Brown M", "Davis N"],
+                    year: 2023,
+                    abstract: "We demonstrate the application of HyenaDNA for long-range genomic predictions in cereals...",
+                    url: "https://example.com/paper5",
+                    source: "arXiv",
+                    relevance_score: 65.4
+                }
+            ];
+
+            // Filter by relevance
+            const filtered = mockPublications.filter(p => p.relevance_score >= config.minRelevance);
+
+            return {
+                metadata: {
+                    generated_date: new Date().toISOString(),
+                    total_publications: filtered.length,
+                    avg_relevance_score: filtered.reduce((sum, p) => sum + p.relevance_score, 0) / filtered.length,
+                    config: config
+                },
+                publications: filtered
+            };
+        }
+
+        // Display results
+        function displayResults(results) {
+            const container = document.getElementById('results-container');
+            container.style.display = 'block';
+
+            // Display statistics
+            const statsRow = document.getElementById('stats-row');
+            statsRow.innerHTML = `
+                <div class="col-md-4">
+                    <div class="stats-box">
+                        <div class="stats-number">${results.publications.length}</div>
+                        <div>Publications Found</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-box">
+                        <div class="stats-number">${results.metadata.avg_relevance_score.toFixed(1)}</div>
+                        <div>Average Relevance</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stats-box">
+                        <div class="stats-number">${results.publications[0]?.year || 'N/A'}</div>
+                        <div>Most Recent Year</div>
+                    </div>
+                </div>
+            `;
+
+            // Display publications
+            const publicationsList = document.getElementById('publications-list');
+            publicationsList.innerHTML = results.publications.map((pub, index) => {
+                const relevanceClass = pub.relevance_score >= 70 ? 'relevance-high' : 
+                                     pub.relevance_score >= 50 ? 'relevance-medium' : 'relevance-low';
+                
+                return `
+                    <div class="publication-card">
+                        <h5>
+                            <span class="relevance-badge ${relevanceClass}">${pub.relevance_score.toFixed(1)}</span>
+                            ${pub.title}
+                        </h5>
+                        <p class="text-muted mb-2">
+                            <strong>Authors:</strong> ${pub.authors.join(', ')} | 
+                            <strong>Year:</strong> ${pub.year} | 
+                            <strong>Source:</strong> ${pub.source}
+                        </p>
+                        <p>${pub.abstract}</p>
+                        <a href="${pub.url}" target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-link"></i> View Paper
+                        </a>
+                    </div>
+                `;
+            }).join('');
+
+            // Scroll to results
+            container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Download JSON
+        function downloadJSON() {
+            if (!searchResults) return;
+            
+            const dataStr = JSON.stringify(searchResults, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'literature_review_' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+        }
+
+        // Download Markdown
+        function downloadMarkdown() {
+            if (!searchResults) return;
+            
+            let markdown = `# Literature Review Results\n\n`;
+            markdown += `**Generated:** ${new Date().toLocaleDateString()}\n\n`;
+            markdown += `**Total Publications:** ${searchResults.publications.length}\n\n`;
+            markdown += `**Average Relevance:** ${searchResults.metadata.avg_relevance_score.toFixed(1)}/100\n\n`;
+            markdown += `---\n\n`;
+            
+            searchResults.publications.forEach((pub, index) => {
+                markdown += `## ${index + 1}. ${pub.title}\n\n`;
+                markdown += `**Relevance Score:** ${pub.relevance_score.toFixed(1)}/100\n\n`;
+                markdown += `**Authors:** ${pub.authors.join(', ')}\n\n`;
+                markdown += `**Year:** ${pub.year} | **Source:** ${pub.source}\n\n`;
+                markdown += `**Abstract:** ${pub.abstract}\n\n`;
+                markdown += `**URL:** [${pub.url}](${pub.url})\n\n`;
+                markdown += `---\n\n`;
+            });
+            
+            const dataBlob = new Blob([markdown], { type: 'text/markdown' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'literature_review_' + new Date().toISOString().split('T')[0] + '.md';
+            link.click();
+        }
+
+        // Helper function
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Initialize with default template
+        window.onload = function() {
+            loadTemplate('plant-genomics');
+        };
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

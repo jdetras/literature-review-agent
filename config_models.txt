@@ -1,0 +1,23 @@
+# Target Models Configuration
+# One model per line
+# Lines starting with # are comments
+# You can add any models you want to track
+
+# Plant Genomics Models
+AgroNT
+PlantCAD
+DNABERT
+DNABERT-2
+Nucleotide Transformer
+HyenaDNA
+Caduceus
+GenSLM
+GENA-LM
+Enformer
+GPN
+Evo
+PlantBERT
+
+# Add your own models below:
+# YourModel
+# AnotherModel
