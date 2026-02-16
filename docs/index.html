@@ -26,6 +26,17 @@
             padding-bottom: 20px;
             border-bottom: 3px solid #667eea;
         }
+        .mode-selector {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .mode-btn {
+            width: 100%;
+            padding: 15px;
+            margin: 5px 0;
+        }
         .config-section {
             background: #f8f9fa;
             padding: 25px;
@@ -138,9 +149,12 @@
             border-color: #667eea;
             background: #e7f1ff;
         }
-        .progress-bar-container {
-            display: none;
+        .alert-info-custom {
+            background: #cfe2ff;
+            border-left: 5px solid #0d6efd;
+            padding: 15px;
             margin: 20px 0;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -149,100 +163,125 @@
         <!-- Header -->
         <div class="header">
             <h1><i class="bi bi-book"></i> Literature Review Agent</h1>
-            <p class="lead">Configure and run automated literature searches directly in your browser</p>
+            <p class="lead">Configure and run automated literature searches</p>
         </div>
 
-        <!-- Template Selector -->
-        <div class="template-selector">
-            <h4><i class="bi bi-grid"></i> Quick Start Templates</h4>
+        <!-- Mode Selector -->
+        <div class="mode-selector">
+            <h4><i class="bi bi-gear"></i> Search Mode</h4>
             <div class="row">
-                <div class="col-md-4">
-                    <div class="template-card" onclick="loadTemplate('plant-genomics')">
-                        <h5>🌾 Plant Genomics</h5>
-                        <small>Search genomic LLMs for rice, wheat, and cereals</small>
-                    </div>
+                <div class="col-md-6">
+                    <button class="btn btn-outline-primary mode-btn" onclick="setMode('python')">
+                        <i class="bi bi-terminal"></i> Run Python Script Locally
+                        <br><small>Requires Python installed</small>
+                    </button>
                 </div>
-                <div class="col-md-4">
-                    <div class="template-card" onclick="loadTemplate('cancer-research')">
-                        <h5>🧬 Cancer Research</h5>
-                        <small>Search AI models for cancer and immunotherapy</small>
-                    </div>
+                <div class="col-md-6">
+                    <button class="btn btn-outline-secondary mode-btn" onclick="setMode('demo')">
+                        <i class="bi bi-eye"></i> View Demo Results
+                        <br><small>Shows example output</small>
+                    </button>
                 </div>
-                <div class="col-md-4">
-                    <div class="template-card" onclick="loadTemplate('custom')">
-                        <h5>⚙️ Custom</h5>
-                        <small>Configure your own search parameters</small>
-                    </div>
-                </div>
+            </div>
+            <div class="alert-info-custom mt-3" id="mode-instructions">
+                <strong>Select a mode above to continue</strong>
             </div>
         </div>
 
-        <!-- Configuration Sections -->
-        <div class="config-section">
-            <h4><i class="bi bi-cpu"></i> Target Models/Methods</h4>
-            <p class="text-muted">Enter models or methods to track (one per line)</p>
-            <textarea id="models-input" class="form-control" rows="6" placeholder="AgroNT
+        <div id="config-interface" style="display: none;">
+            <!-- Template Selector -->
+            <div class="template-selector">
+                <h4><i class="bi bi-grid"></i> Quick Start Templates</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="loadTemplate('plant-genomics')">
+                            <h5>🌾 Plant Genomics</h5>
+                            <small>Search genomic LLMs for rice, wheat, and cereals</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="loadTemplate('cancer-research')">
+                            <h5>🧬 Cancer Research</h5>
+                            <small>Search AI models for cancer and immunotherapy</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="template-card" onclick="loadTemplate('custom')">
+                            <h5>⚙️ Custom</h5>
+                            <small>Configure your own search parameters</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Sections -->
+            <div class="config-section">
+                <h4><i class="bi bi-cpu"></i> Target Models/Methods</h4>
+                <p class="text-muted">Enter models or methods to track (one per line)</p>
+                <textarea id="models-input" class="form-control" rows="6" placeholder="AgroNT
 DNABERT
 PlantCAD
 Nucleotide Transformer
 HyenaDNA"></textarea>
-        </div>
+            </div>
 
-        <div class="config-section">
-            <h4><i class="bi bi-journal-text"></i> Research Topics</h4>
-            <p class="text-muted">Enter your research topics, organisms, or areas of interest (one per line)</p>
-            <textarea id="topics-input" class="form-control" rows="6" placeholder="rice
+            <div class="config-section">
+                <h4><i class="bi bi-journal-text"></i> Research Topics</h4>
+                <p class="text-muted">Enter your research topics, organisms, or areas of interest (one per line)</p>
+                <textarea id="topics-input" class="form-control" rows="6" placeholder="rice
 wheat
 maize
 Oryza sativa
 drought tolerance"></textarea>
-        </div>
+            </div>
 
-        <div class="config-section">
-            <h4><i class="bi bi-sliders"></i> Search Parameters</h4>
-            <div class="row">
-                <div class="col-md-6">
-                    <label class="form-label">Minimum Year</label>
-                    <input type="number" id="min-year" class="form-control" value="2018" min="2000" max="2025">
-                    <small class="text-muted">Only search papers from this year onwards</small>
+            <div class="config-section">
+                <h4><i class="bi bi-sliders"></i> Search Parameters</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="form-label">Minimum Year</label>
+                        <input type="number" id="min-year" class="form-control" value="2018" min="2000" max="2025">
+                        <small class="text-muted">Only search papers from this year onwards</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Minimum Relevance Score (0-100)</label>
+                        <input type="number" id="min-relevance" class="form-control" value="40" min="0" max="100">
+                        <small class="text-muted">Higher = stricter quality filter</small>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">Minimum Relevance Score (0-100)</label>
-                    <input type="number" id="min-relevance" class="form-control" value="40" min="0" max="100">
-                    <small class="text-muted">Higher = stricter quality filter</small>
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label class="form-label">Exclusion Keywords (optional)</label>
+                        <textarea id="exclusion-keywords" class="form-control" rows="3" placeholder="sleep, clinical trial, patient"></textarea>
+                        <small class="text-muted">Papers containing these words will be filtered out (comma-separated)</small>
+                    </div>
                 </div>
             </div>
-            <div class="row mt-3">
-                <div class="col-md-12">
-                    <label class="form-label">Exclusion Keywords (optional)</label>
-                    <textarea id="exclusion-keywords" class="form-control" rows="3" placeholder="sleep, clinical trial, patient"></textarea>
-                    <small class="text-muted">Papers containing these words will be filtered out (comma-separated)</small>
-                </div>
-            </div>
-        </div>
 
-        <!-- Run Button -->
-        <div class="text-center my-4">
-            <button class="btn btn-run" onclick="runSearch()">
-                <i class="bi bi-search"></i> Run Literature Search
-            </button>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-bar-container" id="progress-container">
-            <div class="progress">
-                <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
-                     role="progressbar" style="width: 0%"></div>
+            <!-- Configuration File Generation -->
+            <div class="config-section">
+                <h4><i class="bi bi-file-text"></i> Configuration Files</h4>
+                <p>Download these files and place them in your project folder before running the Python script:</p>
+                <button class="btn btn-primary me-2" onclick="downloadConfigFiles()">
+                    <i class="bi bi-download"></i> Download Config Files
+                </button>
+                <button class="btn btn-success" onclick="showPythonInstructions()">
+                    <i class="bi bi-terminal"></i> Show Python Instructions
+                </button>
             </div>
-            <div class="text-center mt-2">
-                <small id="progress-text">Initializing...</small>
+
+            <!-- Run Button -->
+            <div class="text-center my-4">
+                <button class="btn btn-run" id="run-button" onclick="runSearch()">
+                    <i class="bi bi-search"></i> Run Search
+                </button>
             </div>
         </div>
 
         <!-- Status Panel -->
         <div class="status-panel" id="status-panel">
             <div class="status-message status-info">
-                <i class="bi bi-info-circle"></i> Ready to search. Configure parameters above and click "Run Literature Search"
+                <i class="bi bi-info-circle"></i> Select a search mode above to begin
             </div>
         </div>
 
@@ -275,6 +314,7 @@ drought tolerance"></textarea>
     <script>
         // Global variables
         let searchResults = null;
+        let currentMode = null;
 
         // Template configurations
         const templates = {
@@ -327,6 +367,32 @@ biomarker`,
             }
         };
 
+        // Set search mode
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('config-interface').style.display = 'block';
+            
+            const instructions = document.getElementById('mode-instructions');
+            const runButton = document.getElementById('run-button');
+            
+            if (mode === 'python') {
+                instructions.innerHTML = `
+                    <strong><i class="bi bi-terminal"></i> Python Mode Selected</strong><br>
+                    Configure your search below, then download config files and run the Python script locally.
+                `;
+                runButton.innerHTML = '<i class="bi bi-download"></i> Download & Run Instructions';
+                addStatusMessage('Python mode selected. Configure search and download files.', 'info');
+            } else {
+                instructions.innerHTML = `
+                    <strong><i class="bi bi-eye"></i> Demo Mode Selected</strong><br>
+                    This shows example results. For real searches, use Python mode or see the results from 
+                    <a href="github_pages/index.html" target="_blank">latest automated run</a>.
+                `;
+                runButton.innerHTML = '<i class="bi bi-play"></i> Show Demo Results';
+                addStatusMessage('Demo mode selected. Click templates to see examples.', 'info');
+            }
+        }
+
         // Load template
         function loadTemplate(templateName) {
             const template = templates[templateName];
@@ -336,56 +402,105 @@ biomarker`,
             document.getElementById('min-relevance').value = template.minRelevance;
             document.getElementById('exclusion-keywords').value = template.exclusion;
 
-            // Update active template card
             document.querySelectorAll('.template-card').forEach(card => {
                 card.classList.remove('active');
             });
             event.target.closest('.template-card').classList.add('active');
 
-            addStatusMessage('Template loaded: ' + templateName, 'info');
+            addStatusMessage('Template loaded: ' + templateName, 'success');
         }
 
-        // Add status message
-        function addStatusMessage(message, type = 'info') {
-            const statusPanel = document.getElementById('status-panel');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `status-message status-${type}`;
+        // Download configuration files
+        function downloadConfigFiles() {
+            const config = getConfig();
             
-            const icon = {
-                'info': 'bi-info-circle',
-                'success': 'bi-check-circle',
-                'warning': 'bi-exclamation-triangle',
-                'error': 'bi-x-circle'
-            }[type] || 'bi-info-circle';
+            // Create config_models.txt
+            const modelsBlob = new Blob([config.models.join('\n')], { type: 'text/plain' });
+            downloadFile(modelsBlob, 'config_models.txt');
             
-            messageDiv.innerHTML = `<i class="bi ${icon}"></i> ${message}`;
-            statusPanel.appendChild(messageDiv);
-            statusPanel.scrollTop = statusPanel.scrollHeight;
+            // Create config_topics.txt
+            const topicsBlob = new Blob([config.topics.join('\n')], { type: 'text/plain' });
+            downloadFile(topicsBlob, 'config_topics.txt');
+            
+            // Create config_search.txt
+            const searchConfig = `# Search Parameters
+min_year = ${config.minYear}
+min_relevance = ${config.minRelevance}
+
+[exclusion_keywords]
+${config.exclusion.join('\n')}
+`;
+            const searchBlob = new Blob([searchConfig], { type: 'text/plain' });
+            downloadFile(searchBlob, 'config_search.txt');
+            
+            addStatusMessage('Config files downloaded! See instructions below.', 'success');
+            showPythonInstructions();
         }
 
-        // Update progress
-        function updateProgress(percent, text) {
-            const progressContainer = document.getElementById('progress-container');
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
+        // Show Python instructions
+        function showPythonInstructions() {
+            const instructions = `
+═══════════════════════════════════════════════════════
+HOW TO RUN THE SEARCH
+═══════════════════════════════════════════════════════
+
+1. Make sure you've downloaded the 3 config files:
+   ✓ config_models.txt
+   ✓ config_topics.txt  
+   ✓ config_search.txt
+
+2. Place them in your literature-review-agent folder
+
+3. Open terminal/command prompt in that folder
+
+4. Run:
+   python3 generic_literature_agent.py
+
+5. Wait for search to complete (5-10 minutes)
+
+6. View results in:
+   output_reports/literature_review_summary.txt
+
+7. Convert to web page:
+   python3 convert_to_github_pages.py
+
+8. Open: github_pages/index.html in your browser
+
+═══════════════════════════════════════════════════════
+
+Your search will find REAL papers from bioRxiv, PMC, 
+and arXiv based on your configuration!
+
+After running, you can upload the github_pages folder 
+to your GitHub repository to share the results.
+`;
             
-            progressContainer.style.display = 'block';
-            progressBar.style.width = percent + '%';
-            progressText.textContent = text;
+            alert(instructions);
+            addStatusMessage('Instructions shown. Run the Python script to search.', 'info');
         }
 
-        // Run search (simulated - will use Claude API in production)
-        async function runSearch() {
-            // Get configuration
-            const config = {
+        // Get configuration
+        function getConfig() {
+            return {
                 models: document.getElementById('models-input').value.split('\n').filter(m => m.trim()),
                 topics: document.getElementById('topics-input').value.split('\n').filter(t => t.trim()),
                 minYear: parseInt(document.getElementById('min-year').value),
                 minRelevance: parseFloat(document.getElementById('min-relevance').value),
                 exclusion: document.getElementById('exclusion-keywords').value.split(',').map(k => k.trim()).filter(k => k)
             };
+        }
 
-            // Validation
+        // Run search
+        async function runSearch() {
+            if (currentMode === 'python') {
+                // Python mode - download files and show instructions
+                downloadConfigFiles();
+                return;
+            }
+            
+            // Demo mode - show example results
+            const config = getConfig();
+            
             if (config.models.length === 0) {
                 addStatusMessage('Error: Please add at least one model', 'error');
                 return;
@@ -395,67 +510,58 @@ biomarker`,
                 return;
             }
 
-            // Clear previous results
             document.getElementById('status-panel').innerHTML = '';
             document.getElementById('results-container').style.display = 'none';
             
-            // Disable button
-            const runBtn = document.querySelector('.btn-run');
+            const runBtn = document.getElementById('run-button');
             runBtn.disabled = true;
-            runBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Searching...';
 
-            addStatusMessage('Starting literature search...', 'info');
-            updateProgress(10, 'Initializing search...');
+            addStatusMessage('Demo mode: Showing example results...', 'info');
 
             try {
-                // Simulate search process (in production, this calls Claude API)
-                addStatusMessage(`Configuration: ${config.models.length} models, ${config.topics.length} topics`, 'info');
-                updateProgress(20, 'Generating search queries...');
-                await sleep(1000);
-
-                addStatusMessage('Searching bioRxiv...', 'info');
-                updateProgress(40, 'Searching bioRxiv...');
-                await sleep(1500);
-
-                addStatusMessage('Searching PubMed Central...', 'info');
-                updateProgress(60, 'Searching PubMed Central...');
-                await sleep(1500);
-
-                addStatusMessage('Searching arXiv...', 'info');
-                updateProgress(80, 'Searching arXiv...');
-                await sleep(1500);
-
-                // Generate mock results
-                const results = await generateMockResults(config);
-                
-                updateProgress(90, 'Processing results...');
-                await sleep(500);
-
-                addStatusMessage(`Found ${results.publications.length} relevant publications`, 'success');
-                updateProgress(100, 'Complete!');
-
-                // Display results
-                displayResults(results);
-                searchResults = results;
-
-                addStatusMessage('Search complete! Results displayed below.', 'success');
-
+                // Check if real results exist
+                const realResults = await loadRealResults();
+                if (realResults) {
+                    displayResults(realResults);
+                    searchResults = realResults;
+                    addStatusMessage('✓ Loaded results from latest automated run', 'success');
+                } else {
+                    // Show demo results
+                    const demoResults = generateDemoResults(config);
+                    displayResults(demoResults);
+                    searchResults = demoResults;
+                    addStatusMessage('Demo results shown. For real searches, use Python mode.', 'warning');
+                }
             } catch (error) {
                 addStatusMessage('Error: ' + error.message, 'error');
             } finally {
                 runBtn.disabled = false;
-                runBtn.innerHTML = '<i class="bi bi-search"></i> Run Literature Search';
-                setTimeout(() => {
-                    document.getElementById('progress-container').style.display = 'none';
-                }, 2000);
             }
         }
 
-        // Generate mock results (placeholder for actual API call)
-        async function generateMockResults(config) {
-            // In production, this would call the Anthropic API to run the actual search
-            // For demo purposes, we generate realistic mock data
-            
+        // Try to load real results from automated runs
+        async function loadRealResults() {
+            try {
+                const response = await fetch('github_pages/index.html');
+                if (response.ok) {
+                    // Results exist - redirect or link to them
+                    return null; // Will show demo, but inform user
+                }
+                
+                // Try to load JSON directly
+                const jsonResponse = await fetch('output_reports/literature_review.json');
+                if (jsonResponse.ok) {
+                    return await jsonResponse.json();
+                }
+                
+                return null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Generate demo results
+        function generateDemoResults(config) {
             const mockPublications = [
                 {
                     title: "AgroNT: A Foundation Model for Agricultural Genome Analysis",
@@ -470,41 +576,13 @@ biomarker`,
                     title: "Deep Learning Approaches for Rice Genome Annotation Using DNABERT",
                     authors: ["Wang X", "Lee S", "Park M"],
                     year: 2023,
-                    abstract: "This study applies DNABERT architecture to rice genome annotation tasks, achieving state-of-the-art results...",
+                    abstract: "This study applies DNABERT architecture to rice genome annotation tasks...",
                     url: "https://example.com/paper2",
                     source: "PMC",
                     relevance_score: 78.3
-                },
-                {
-                    title: "Nucleotide Transformers for Plant Genomics: A Comparative Study",
-                    authors: ["Garcia A", "Thompson B"],
-                    year: 2023,
-                    abstract: "We compare various nucleotide transformer architectures on plant genomic datasets including wheat and maize...",
-                    url: "https://example.com/paper3",
-                    source: "arXiv",
-                    relevance_score: 72.1
-                },
-                {
-                    title: "PlantCAD: Computer-Aided Design of Plant Genomes with Foundation Models",
-                    authors: ["Patel R", "Johnson K", "Liu Y"],
-                    year: 2024,
-                    abstract: "PlantCAD introduces a novel approach to genome design using foundation models trained on diverse plant species...",
-                    url: "https://example.com/paper4",
-                    source: "bioRxiv",
-                    relevance_score: 68.9
-                },
-                {
-                    title: "HyenaDNA Applications in Cereal Crop Genomics",
-                    authors: ["Brown M", "Davis N"],
-                    year: 2023,
-                    abstract: "We demonstrate the application of HyenaDNA for long-range genomic predictions in cereals...",
-                    url: "https://example.com/paper5",
-                    source: "arXiv",
-                    relevance_score: 65.4
                 }
             ];
 
-            // Filter by relevance
             const filtered = mockPublications.filter(p => p.relevance_score >= config.minRelevance);
 
             return {
@@ -512,7 +590,8 @@ biomarker`,
                     generated_date: new Date().toISOString(),
                     total_publications: filtered.length,
                     avg_relevance_score: filtered.reduce((sum, p) => sum + p.relevance_score, 0) / filtered.length,
-                    config: config
+                    config: config,
+                    note: "DEMO MODE - These are example results. Run Python script for real searches."
                 },
                 publications: filtered
             };
@@ -523,7 +602,20 @@ biomarker`,
             const container = document.getElementById('results-container');
             container.style.display = 'block';
 
-            // Display statistics
+            const isDemo = results.metadata.note;
+
+            if (isDemo) {
+                container.innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong><i class="bi bi-exclamation-triangle"></i> Demo Mode</strong><br>
+                        These are example results. To get real search results:<br>
+                        1. Download config files above<br>
+                        2. Run <code>python3 generic_literature_agent.py</code><br>
+                        3. View results in <code>github_pages/index.html</code>
+                    </div>
+                ` + container.innerHTML;
+            }
+
             const statsRow = document.getElementById('stats-row');
             statsRow.innerHTML = `
                 <div class="col-md-4">
@@ -546,7 +638,6 @@ biomarker`,
                 </div>
             `;
 
-            // Display publications
             const publicationsList = document.getElementById('publications-list');
             publicationsList.innerHTML = results.publications.map((pub, index) => {
                 const relevanceClass = pub.relevance_score >= 70 ? 'relevance-high' : 
@@ -571,8 +662,35 @@ biomarker`,
                 `;
             }).join('');
 
-            // Scroll to results
             container.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Add status message
+        function addStatusMessage(message, type = 'info') {
+            const statusPanel = document.getElementById('status-panel');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `status-message status-${type}`;
+            
+            const icon = {
+                'info': 'bi-info-circle',
+                'success': 'bi-check-circle',
+                'warning': 'bi-exclamation-triangle',
+                'error': 'bi-x-circle'
+            }[type] || 'bi-info-circle';
+            
+            messageDiv.innerHTML = `<i class="bi ${icon}"></i> ${message}`;
+            statusPanel.appendChild(messageDiv);
+            statusPanel.scrollTop = statusPanel.scrollHeight;
+        }
+
+        // Download file helper
+        function downloadFile(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
         }
 
         // Download JSON
@@ -581,21 +699,16 @@ biomarker`,
             
             const dataStr = JSON.stringify(searchResults, null, 2);
             const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'literature_review_' + new Date().toISOString().split('T')[0] + '.json';
-            link.click();
+            downloadFile(dataBlob, 'literature_review_demo_' + new Date().toISOString().split('T')[0] + '.json');
         }
 
         // Download Markdown
         function downloadMarkdown() {
             if (!searchResults) return;
             
-            let markdown = `# Literature Review Results\n\n`;
+            let markdown = `# Literature Review Results (Demo)\n\n`;
             markdown += `**Generated:** ${new Date().toLocaleDateString()}\n\n`;
             markdown += `**Total Publications:** ${searchResults.publications.length}\n\n`;
-            markdown += `**Average Relevance:** ${searchResults.metadata.avg_relevance_score.toFixed(1)}/100\n\n`;
             markdown += `---\n\n`;
             
             searchResults.publications.forEach((pub, index) => {
@@ -603,28 +716,12 @@ biomarker`,
                 markdown += `**Relevance Score:** ${pub.relevance_score.toFixed(1)}/100\n\n`;
                 markdown += `**Authors:** ${pub.authors.join(', ')}\n\n`;
                 markdown += `**Year:** ${pub.year} | **Source:** ${pub.source}\n\n`;
-                markdown += `**Abstract:** ${pub.abstract}\n\n`;
-                markdown += `**URL:** [${pub.url}](${pub.url})\n\n`;
                 markdown += `---\n\n`;
             });
             
             const dataBlob = new Blob([markdown], { type: 'text/markdown' });
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'literature_review_' + new Date().toISOString().split('T')[0] + '.md';
-            link.click();
+            downloadFile(dataBlob, 'literature_review_demo_' + new Date().toISOString().split('T')[0] + '.md');
         }
-
-        // Helper function
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-
-        // Initialize with default template
-        window.onload = function() {
-            loadTemplate('plant-genomics');
-        };
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
